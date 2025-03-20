@@ -81,7 +81,6 @@ def get_current_values(tags):
     
 def atualizar_status():
     global config
-    status = get_current_values(CS)
     # Exemplo de lógica de configuração
 
     #RIO GRANDE DO SUL
