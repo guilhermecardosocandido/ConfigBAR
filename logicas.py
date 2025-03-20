@@ -81,69 +81,70 @@ def get_current_values(tags):
     
 def atualizar_status():
     global config
+    status = get_current_values()
     # Exemplo de lógica de configuração
 
     #RIO GRANDE DO SUL
 
     # ATLÂNTIDA 2 
-    if (status.get('RSATL2_230_CH847_S.s') == 'Estado do ponto digital:on' or 
-        status.get('RSATL2_230_CH867_S.s') == 'Estado do ponto digital:on' or 
-        status.get('RSATL2_230_CH877_S.s') == 'Estado do ponto digital:on' or 
-        status.get('RSATL2_230_CH887_S.s') == 'Estado do ponto digital:on' or 
-        status.get('RSATL2_230_CH897_S.s') == 'Estado do ponto digital:on' or 
-        status.get('RSATL2_230_CH917_S.s') == 'Estado do ponto digital:on'):
+    if (status('RSATL2_230_CH847_S.s') == 'Estado do ponto digital:on' or 
+        status('RSATL2_230_CH867_S.s') == 'Estado do ponto digital:on' or 
+        status('RSATL2_230_CH877_S.s') == 'Estado do ponto digital:on' or 
+        status('RSATL2_230_CH887_S.s') == 'Estado do ponto digital:on' or 
+        status('RSATL2_230_CH897_S.s') == 'Estado do ponto digital:on' or 
+        status('RSATL2_230_CH917_S.s') == 'Estado do ponto digital:on'):
         
         config['ATL2'] = 0
 
-    elif (status.get('RSATL2_230_CH871_S.s') == 'Estado do ponto digital:on' and 
-          status.get('RSATL2_230_CH891_S.s') == 'Estado do ponto digital:on' and 
-          status.get('RSATL2_230_CH911_S.s') == 'Estado do ponto digital:on') or \
-         (status.get('RSATL2_230_CH873_S.s') == 'Estado do ponto digital:on' and 
-          status.get('RSATL2_230_CH893_S.s') == 'Estado do ponto digital:on' and 
-          status.get('RSATL2_230_CH913_S.s') == 'Estado do ponto digital:on'):
+    elif (status('RSATL2_230_CH871_S.s') == 'Estado do ponto digital:on' and 
+          status('RSATL2_230_CH891_S.s') == 'Estado do ponto digital:on' and 
+          status('RSATL2_230_CH911_S.s') == 'Estado do ponto digital:on') or \
+         (status('RSATL2_230_CH873_S.s') == 'Estado do ponto digital:on' and 
+          status('RSATL2_230_CH893_S.s') == 'Estado do ponto digital:on' and 
+          status('RSATL2_230_CH913_S.s') == 'Estado do ponto digital:on'):
         
         config['ATL2'] = 0
 
-    elif (status.get('RSATL2_230_CH911_S.s') == 'Estado do ponto digital:on' and 
-          status.get('RSATL2_230_CH891_S.s') == 'Estado do ponto digital:on' and 
-          status.get('RSATL2_230_CH841_S.s') == 'Estado do ponto digital:on') or \
-         (status.get('RSATL2_230_CH913_S.s') == 'Estado do ponto digital:on' and 
-          status.get('RSATL2_230_CH893_S.s') == 'Estado do ponto digital:on' and 
-          status.get('RSATL2_230_CH843_S.s') == 'Estado do ponto digital:on'):
+    elif (status('RSATL2_230_CH911_S.s') == 'Estado do ponto digital:on' and 
+          status('RSATL2_230_CH891_S.s') == 'Estado do ponto digital:on' and 
+          status('RSATL2_230_CH841_S.s') == 'Estado do ponto digital:on') or \
+         (status('RSATL2_230_CH913_S.s') == 'Estado do ponto digital:on' and 
+          status('RSATL2_230_CH893_S.s') == 'Estado do ponto digital:on' and 
+          status('RSATL2_230_CH843_S.s') == 'Estado do ponto digital:on'):
         
         config['ATL2'] = 0
 
-    elif (status.get('RSATL2_230_CH911_S.s') == 'Estado do ponto digital:on' and 
-          status.get('RSATL2_230_CH871_S.s') == 'Estado do ponto digital:on' and 
-          status.get('RSATL2_230_CH841_S.s') == 'Estado do ponto digital:on') or \
-         (status.get('RSATL2_230_CH913_S.s') == 'Estado do ponto digital:on' and 
-          status.get('RSATL2_230_CH873_S.s') == 'Estado do ponto digital:on' and 
-          status.get('RSATL2_230_CH843_S.s') == 'Estado do ponto digital:on'):
-        
-        config['ATL2'] = 0
-
-
-    elif (status.get('RSATL2_230_CH871_S.s') == 'Estado do ponto digital:on' and 
-          status.get('RSATL2_230_CH891_S.s') == 'Estado do ponto digital:on' and 
-          status.get('RSATL2_230_CH841_S.s') == 'Estado do ponto digital:on') or \
-         (status.get('RSATL2_230_CH873_S.s') == 'Estado do ponto digital:on' and 
-          status.get('RSATL2_230_CH893_S.s') == 'Estado do ponto digital:on' and 
-          status.get('RSATL2_230_CH843_S.s') == 'Estado do ponto digital:on'):
+    elif (status('RSATL2_230_CH911_S.s') == 'Estado do ponto digital:on' and 
+          status('RSATL2_230_CH871_S.s') == 'Estado do ponto digital:on' and 
+          status('RSATL2_230_CH841_S.s') == 'Estado do ponto digital:on') or \
+         (status('RSATL2_230_CH913_S.s') == 'Estado do ponto digital:on' and 
+          status('RSATL2_230_CH873_S.s') == 'Estado do ponto digital:on' and 
+          status('RSATL2_230_CH843_S.s') == 'Estado do ponto digital:on'):
         
         config['ATL2'] = 0
 
 
-    elif (status.get('RSATL2_230_CH861_S.s') == 'Estado do ponto digital:on' and 
-          status.get('RSATL2_230_CH881_S.s') == 'Estado do ponto digital:on') or \
-         (status.get('RSATL2_230_CH863_S.s') == 'Estado do ponto digital:on' and 
-          status.get('RSATL2_230_CH883_S.s') == 'Estado do ponto digital:on'):
+    elif (status('RSATL2_230_CH871_S.s') == 'Estado do ponto digital:on' and 
+          status('RSATL2_230_CH891_S.s') == 'Estado do ponto digital:on' and 
+          status('RSATL2_230_CH841_S.s') == 'Estado do ponto digital:on') or \
+         (status('RSATL2_230_CH873_S.s') == 'Estado do ponto digital:on' and 
+          status('RSATL2_230_CH893_S.s') == 'Estado do ponto digital:on' and 
+          status('RSATL2_230_CH843_S.s') == 'Estado do ponto digital:on'):
         
         config['ATL2'] = 0
 
-    elif (status.get('RSATL2_230_CH861_S.s') == 'Estado do ponto digital:on' and 
-          status.get('RSATL2_230_CH881_S.s') == 'Estado do ponto digital:on') or \
-         (status.get('RSATL2_230_CH863_S.s') == 'Estado do ponto digital:on' and 
-          status.get('RSATL2_230_CH883_S.s') == 'Estado do ponto digital:on'):
+
+    elif (status('RSATL2_230_CH861_S.s') == 'Estado do ponto digital:on' and 
+          status('RSATL2_230_CH881_S.s') == 'Estado do ponto digital:on') or \
+         (status('RSATL2_230_CH863_S.s') == 'Estado do ponto digital:on' and 
+          status('RSATL2_230_CH883_S.s') == 'Estado do ponto digital:on'):
+        
+        config['ATL2'] = 0
+
+    elif (status('RSATL2_230_CH861_S.s') == 'Estado do ponto digital:on' and 
+          status('RSATL2_230_CH881_S.s') == 'Estado do ponto digital:on') or \
+         (status('RSATL2_230_CH863_S.s') == 'Estado do ponto digital:on' and 
+          status('RSATL2_230_CH883_S.s') == 'Estado do ponto digital:on'):
         
         config['ATL2'] = 0
 
