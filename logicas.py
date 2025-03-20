@@ -19,60 +19,34 @@ PI = PI()
 PI.connect()
 
 # Inicializa as variáveis globais
-SE = []  # Para armazenar a primeira coluna
 CS = []  # Para armazenar as demais colunas como dicionário
-UF = {}  # Para armazenar as colunas como dicionário {primeira_coluna: segunda_coluna}
 config = {}  # Dicionário de configuração
 
 def carregar_dados():
     """Carrega dados dos arquivos CSV do GitHub."""
-    global SE, config, CS, UF
-    SE.clear()
+    global config, CS
     CS.clear()
-    UF.clear()
     
+    g = Github(GITHUB_TOKEN)
+    repo = g.get_repo(GITHUB_REPO)
+       
+    # Carregar cs.csv
     try:
-        g = Github(GITHUB_TOKEN)
-        repo = g.get_repo(GITHUB_REPO)
+        content = repo.get_contents("cs.csv")
+        cs_content = content.decoded_content.decode('utf-8')
+        cs_lines = cs_content.splitlines()
         
-        # Carregar se.csv
-        try:
-            content = repo.get_contents("se.csv")
-            se_content = content.decoded_content.decode('utf-8')
-            se_lines = se_content.splitlines()
-            
-            for line in se_lines:
-                dados = line.split(';')
-                if dados:  # Verifica se a linha não está vazia
-                    SE.append(dados[0])  # Primeira coluna
-                    UF[dados[0]] = dados[1]  # Relaciona primeira com segunda coluna
-                    
-        except Exception as e:
-            print(f"Erro ao carregar se.csv do GitHub: {e}")
-            return [], {}
-            
-        # Carregar cs.csv
-        try:
-            content = repo.get_contents("cs.csv")
-            cs_content = content.decoded_content.decode('utf-8')
-            cs_lines = cs_content.splitlines()
-            
-            for line in cs_lines:
-                dados = line.split(';')
-                if dados:  # Verifica se a linha não está vazia
-                    CS.append(dados[0])  # Primeira coluna
+        for line in cs_lines:
+            dados = line.split(';')
+            if dados:  # Verifica se a linha não está vazia
+                CS.append(dados[0])  # Primeira coluna
   
 
-            atualizar_status()            
-        except Exception as e:
-            print(f"Erro ao carregar cs.csv do GitHub: {e}")
-            return [], {}
-            
-        return SE, UF
-        
+        atualizar_status()            
     except Exception as e:
-        print(f"Erro ao acessar GitHub: {e}")
+        print(f"Erro ao carregar cs.csv do GitHub: {e}")
         return [], {}
+            
 
 def atualizar_status():
     global config
