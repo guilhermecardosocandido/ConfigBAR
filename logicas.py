@@ -1,8 +1,6 @@
-import csv
-import os
-import sys
-sys.path.append(r"Q:\COSRS1\PreOp_Treal\ConfigBAR\LibPI")
 from LibPI.LibPI import PI 
+from github import Github
+from config import GITHUB_TOKEN, GITHUB_REPO  # Changed to import from config
 
 # Inicializa a conexão com o PI
 PI = PI()
@@ -14,41 +12,68 @@ CS = []  # Para armazenar as demais colunas como dicionário
 UF = {}  # Para armazenar as colunas como dicionário {primeira_coluna: segunda_coluna}
 config = {}  # Dicionário de configuração
 
-def resource_path(relative_path):
-    """Retorna o caminho completo do recurso."""
-    if getattr(sys, 'frozen', False):  # Executável
-        base_path = sys._MEIPASS
-    else:  # Desenvolvimento
-        base_path = os.path.dirname(__file__)  # Caminho onde o logicas.py está
-    
-    full_path = os.path.join(base_path, relative_path)
-    print(f"Resource path resolved: {full_path}")  # Debug
-    return full_path
-
 def carregar_dados():
+    """Carrega dados dos arquivos CSV do GitHub."""
     global SE, config, CS, UF
     SE.clear()
     CS.clear()
     UF.clear()
     
-    # Caminho para a pasta de rede onde os arquivos CSV estão armazenados
-    pasta_rede = r"Q:\COSRS1\PreOp_Treal\ConfigBAR"
-    
-    # Abre e lê o arquivo CSV 'se.csv'
-    with open(os.path.join(pasta_rede, 'se.csv'), mode='r', newline='', encoding='utf-8') as arquivo:
-        leitor = csv.reader(arquivo, delimiter=';') # Define o delimitador como ponto e vírgula
-        for linha in leitor:
-            SE.append(linha[0]) # Armazena o valor da primeira coluna na lista SE
-            UF[linha[0]] = linha[1]
-    
-    # Abre e lê o arquivo CSV 'cs.csv'
-    with open(os.path.join(pasta_rede, 'cs.csv'), mode='r', newline='', encoding='utf-8') as arquivo:
-        leitor = csv.reader(arquivo, delimiter=';') # Define o delimitador como ponto e vírgula
-        for linha in leitor:
-            CS.append(linha[0]) # Armazena o valor da primeira coluna na lista CS
+    try:
+        g = Github(GITHUB_TOKEN)
+        repo = g.get_repo(GITHUB_REPO)
+        
+        # Carregar se.csv
+        try:
+            content = repo.get_contents("se.csv")
+            se_content = content.decoded_content.decode('utf-8')
+            se_lines = se_content.splitlines()
             
-    # Atualiza o status
-    atualizar_status()
+            # Add debug print
+            print("Conteúdo de se.csv:")
+            print(se_content[:200])  # Print first 200 chars
+            
+            for line in se_lines:
+                dados = line.split(';')
+                if dados:  # Verifica se a linha não está vazia
+                    SE.append(dados[0])  # Primeira coluna
+                    UF[dados[0]] = dados[1]  # Relaciona primeira com segunda coluna
+                    
+        except Exception as e:
+            print(f"Erro ao carregar se.csv do GitHub: {e}")
+            return [], {}
+            
+        # Carregar cs.csv
+        try:
+            content = repo.get_contents("cs.csv")
+            cs_content = content.decoded_content.decode('utf-8')
+            cs_lines = cs_content.splitlines()
+            
+            # Add debug print
+            print("\nConteúdo de cs.csv:")
+            print(cs_content[:200])  # Print first 200 chars
+            
+            for line in cs_lines:
+                dados = line.split(';')
+                if dados:  # Verifica se a linha não está vazia
+                    CS.append(dados[0])  # Primeira coluna
+                    
+            # Add debug print
+            print(f"\nTotal de equipamentos carregados:")
+            print(f"SE: {len(SE)}")
+            print(f"CS: {len(CS)}")
+            print(f"UF: {len(UF)}")
+
+            atualizar_status()            
+        except Exception as e:
+            print(f"Erro ao carregar cs.csv do GitHub: {e}")
+            return [], {}
+            
+        return SE, UF
+        
+    except Exception as e:
+        print(f"Erro ao acessar GitHub: {e}")
+        return [], {}
 
 def atualizar_status():
     global config
@@ -6334,8 +6359,8 @@ def atualizar_status():
 
     else:
         config['SIA2'] = 1
-
-#    print("Configurações atualizadas:", config)
+    print(status.get('MSSIA2_230_CH7431_S.s'))
+    print("Configurações atualizadas:", config)
 versao = 'ConfigBAR v1.1.5'
 
 #v1.0.0: versão inicial.
