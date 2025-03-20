@@ -29,10 +29,6 @@ def carregar_dados():
             se_content = content.decoded_content.decode('utf-8')
             se_lines = se_content.splitlines()
             
-            # Add debug print
-            print("Conteúdo de se.csv:")
-            print(se_content[:200])  # Print first 200 chars
-            
             for line in se_lines:
                 dados = line.split(';')
                 if dados:  # Verifica se a linha não está vazia
@@ -49,20 +45,11 @@ def carregar_dados():
             cs_content = content.decoded_content.decode('utf-8')
             cs_lines = cs_content.splitlines()
             
-            # Add debug print
-            print("\nConteúdo de cs.csv:")
-            print(cs_content[:200])  # Print first 200 chars
-            
             for line in cs_lines:
                 dados = line.split(';')
                 if dados:  # Verifica se a linha não está vazia
                     CS.append(dados[0])  # Primeira coluna
-                    
-            # Add debug print
-            print(f"\nTotal de equipamentos carregados:")
-            print(f"SE: {len(SE)}")
-            print(f"CS: {len(CS)}")
-            print(f"UF: {len(UF)}")
+  
 
             atualizar_status()            
         except Exception as e:
@@ -6359,8 +6346,8 @@ def atualizar_status():
 
     else:
         config['SIA2'] = 1
-    print(status.get('MSSIA2_230_CH7431_S.s'))
-    print("Configurações atualizadas:", config)
+
+#    print("Configurações atualizadas:", config)
 versao = 'ConfigBAR v1.1.5'
 
 #v1.0.0: versão inicial.
