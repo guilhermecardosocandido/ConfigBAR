@@ -2,8 +2,8 @@ from LibPI.LibPI import PI
 from github import Github
 from config import GITHUB_TOKEN, GITHUB_REPO  # Changed to import from config
 import sys
-
-versao = 'ConfigBAR v2.0.0'
+import os
+import clr
 
 #v1.0.0: versão inicial.
 #v1.1.0: inclusão de limpeza de cache e recarregar biblioteca logicas.py ao atualizar status e ajustado lógica devido seccionamento em PSO2.
@@ -14,9 +14,24 @@ versao = 'ConfigBAR v2.0.0'
 #v1.1.5: seccionamento LT 230 kV Caxias 2 / Farroupilha na SE Caxias Norte - 10/03/25
 #v2.0.0: nova interface gráfica com melhorias
 
-# Inicializa a conexão com o PI
-PI = PI()
-PI.connect()
+def find_dll(dir = ""):
+    print(os.path.dirname(__file__))
+    sys.path.append(os.path.dirname(__file__))
+    try:
+        clr.AddReference('OSIsoft.AFSDK')
+        return "dll adicionada com sucesso", 1
+    except:
+        return "dll não encontrada", 0
+
+from OSIsoft.AF.PI import PIServers, PIPoint
+from OSIsoft.AF.Time import AFTime, AFTimeRange
+from OSIsoft.AF.Data import AFBoundaryType
+
+# Inicializar conexão com o PI Server
+pi_servers = PIServers()
+pi_server = pi_servers.get_Item("his1.5")
+
+
 
 # Inicializa as variáveis globais
 CS = []  # Para armazenar as demais colunas como dicionário
@@ -47,10 +62,26 @@ def carregar_dados():
         print(f"Erro ao carregar cs.csv do GitHub: {e}")
         return [], {}
             
-
+def get_current_values(tags):
+    """Get current values for multiple tags using OSIsoft SDK directly"""
+    values = {}
+    try:
+        for tag in tags:
+            try:
+                pt = PIPoint.FindPIPoint(pi_server, tag)
+                value = pt.CurrentValue().Value
+                values[tag] = str(value)  # Convert to string to match LibPI format
+            except Exception as e:
+                print(f"Error reading tag {tag}: {e}")
+                values[tag] = None
+        return values
+    except Exception as e:
+        print(f"Error getting current values: {e}")
+        return {}
+    
 def atualizar_status():
     global config
-    status = PI.currentValues(CS, 'dict')
+    status = get_current_values(CS)
     # Exemplo de lógica de configuração
 
     #RIO GRANDE DO SUL
