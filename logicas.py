@@ -5,6 +5,8 @@ import os
 import clr
 import re
 from System.Collections.Generic import List
+import certifi
+import requests
 
 #v1.0.0: versão inicial.
 #v1.1.0: inclusão de limpeza de cache e recarregar biblioteca logicas.py ao atualizar get_current_values e ajustado lógica devido seccionamento em PSO2.
@@ -14,6 +16,11 @@ from System.Collections.Generic import List
 #v1.1.4: alteração da IO-OI.S.PPE, revisão 37 e IO-OI.S.PPE, revisão 27
 #v1.1.5: seccionamento LT 230 kV Caxias 2 / Farroupilha na SE Caxias Norte - 10/03/25
 #v2.0.0: nova interface gráfica com melhorias
+# Configuração de certificados para ambientes empacotados
+if getattr(sys, 'frozen', False):
+    os.environ["REQUESTS_CA_BUNDLE"] = os.path.join(sys._MEIPASS, 'certifi', 'cacert.pem')
+else:
+    os.environ["REQUESTS_CA_BUNDLE"] = certifi.where()
 
 def extract_tags_from_code():
     """Extract all PI tags from the code automatically"""
