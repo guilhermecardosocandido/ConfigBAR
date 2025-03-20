@@ -6381,6 +6381,6 @@ def atualizar_get_current_values():
     else:
         config['SIA2'] = 1
 
-    print("Configurações atualizadas:", config)
+#    print("Configurações atualizadas:", config)
 
 atualizar_get_current_values()
