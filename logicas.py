@@ -16,13 +16,13 @@ import clr
 def find_dll():
     """Find and load OSIsoft.AFSDK dll from _internal folder"""
     try:
-        # Get program's root directory
-        root_dir = os.path.dirname(os.path.abspath(__file__))
+        # Get program's root directory (where main.py is)
+        root_dir = os.path.dirname(os.path.dirname(__file__))  # Go up one level from logicas.py
         
         # Path to _internal folder
         internal_path = os.path.join(root_dir, "_internal")
         
-        # Add _internal to system path
+        # Add _internal to system path if not already there
         if internal_path not in sys.path:
             sys.path.append(internal_path)
         
@@ -33,6 +33,10 @@ def find_dll():
     except Exception as e:
         print(f"Error loading OSIsoft SDK: {e}")
         return False
+
+# Initialize OSIsoft SDK
+if not find_dll():
+    raise ImportError("Could not load OSIsoft.AFSDK")
 
 from OSIsoft.AF.PI import PIServers, PIPoint
 from OSIsoft.AF.Time import AFTime, AFTimeRange
