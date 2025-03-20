@@ -13,14 +13,26 @@ import clr
 #v1.1.5: seccionamento LT 230 kV Caxias 2 / Farroupilha na SE Caxias Norte - 10/03/25
 #v2.0.0: nova interface gráfica com melhorias
 
-def find_dll(dir = ""):
-    print(os.path.dirname(__file__))
-    sys.path.append(os.path.dirname(__file__))
+def find_dll():
+    """Find and load OSIsoft.AFSDK dll from _internal folder"""
     try:
+        # Get program's root directory
+        root_dir = os.path.dirname(os.path.abspath(__file__))
+        
+        # Path to _internal folder
+        internal_path = os.path.join(root_dir, "_internal")
+        
+        # Add _internal to system path
+        if internal_path not in sys.path:
+            sys.path.append(internal_path)
+        
+        # Try to load the DLL
         clr.AddReference('OSIsoft.AFSDK')
-        return "dll adicionada com sucesso", 1
-    except:
-        return "dll não encontrada", 0
+        return True
+            
+    except Exception as e:
+        print(f"Error loading OSIsoft SDK: {e}")
+        return False
 
 from OSIsoft.AF.PI import PIServers, PIPoint
 from OSIsoft.AF.Time import AFTime, AFTimeRange
@@ -31,7 +43,7 @@ pi_servers = PIServers()
 pi_server = pi_servers.get_Item("his1.5")
 
 config = {}  # Dicionário de configuração
-        
+
 def get_current_values(tags):
     """Get current values for multiple tags using OSIsoft SDK directly"""
     values = {}
