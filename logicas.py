@@ -3,6 +3,17 @@ from github import Github
 from config import GITHUB_TOKEN, GITHUB_REPO  # Changed to import from config
 import sys
 
+versao = 'ConfigBAR v2.0.0'
+
+#v1.0.0: versão inicial.
+#v1.1.0: inclusão de limpeza de cache e recarregar biblioteca logicas.py ao atualizar status e ajustado lógica devido seccionamento em PSO2.
+#v1.1.1: entrada parcial SE Caxias Norte.
+#v1.1.2: entrada seccionamento LT 230 kV CHA/SCR1
+#v1.1.3: entrada cne/mcl e cne/vin
+#v1.1.4: alteração da IO-OI.S.PPE, revisão 37 e IO-OI.S.PPE, revisão 27
+#v1.1.5: seccionamento LT 230 kV Caxias 2 / Farroupilha na SE Caxias Norte - 10/03/25
+#v2.0.0: nova interface gráfica com melhorias
+
 # Inicializa a conexão com o PI
 PI = PI()
 PI.connect()
@@ -6349,15 +6360,7 @@ def atualizar_status():
         config['SIA2'] = 1
 
 #    print("Configurações atualizadas:", config)
-versao = 'ConfigBAR v1.1.5'
 
-#v1.0.0: versão inicial.
-#v1.1.0: inclusão de limpeza de cache e recarregar biblioteca logicas.py ao atualizar status e ajustado lógica devido seccionamento em PSO2.
-#v1.1.1: entrada parcial SE Caxias Norte.
-#v1.1.2: entrada seccionamento LT 230 kV CHA/SCR1
-#v1.1.3: entrada cne/mcl e cne/vin
-#v1.1.4: alteração da IO-OI.S.PPE, revisão 37 e IO-OI.S.PPE, revisão 27
-#V1.1.5: seccionamento LT 230 kV Caxias 2 / Farroupilha na SE Caxias Norte - 10/03/25
 
 # Chama carregar_dados ao iniciar o módulo
 carregar_dados()
