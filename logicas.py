@@ -1,6 +1,7 @@
 from LibPI.LibPI import PI 
 from github import Github
 from config import GITHUB_TOKEN, GITHUB_REPO  # Changed to import from config
+import sys
 
 # Inicializa a conexão com o PI
 PI = PI()
