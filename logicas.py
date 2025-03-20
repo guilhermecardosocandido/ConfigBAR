@@ -4,6 +4,7 @@ import sys
 import os
 import clr
 import re
+from System.Collections.Generic import List
 
 #v1.0.0: versão inicial.
 #v1.1.0: inclusão de limpeza de cache e recarregar biblioteca logicas.py ao atualizar get_current_values e ajustado lógica devido seccionamento em PSO2.
@@ -13,7 +14,6 @@ import re
 #v1.1.4: alteração da IO-OI.S.PPE, revisão 37 e IO-OI.S.PPE, revisão 27
 #v1.1.5: seccionamento LT 230 kV Caxias 2 / Farroupilha na SE Caxias Norte - 10/03/25
 #v2.0.0: nova interface gráfica com melhorias
-
 
 def extract_tags_from_code():
     """Extract all PI tags from the code automatically"""
@@ -28,12 +28,6 @@ def extract_tags_from_code():
     return sorted(list(tags))
 
 tags = extract_tags_from_code()
-
-# # Test code
-# tags = extract_tags_from_code()
-# print(f"Found {len(tags)} tags:")
-# for tag in tags:
-#     print(tag)
 
 def find_dll():
     """Find and load OSIsoft.AFSDK dll from _internal folder"""
@@ -62,7 +56,7 @@ def find_dll():
 if not find_dll():
     raise ImportError("Could not load OSIsoft.AFSDK")
 
-from OSIsoft.AF.PI import PIServers, PIPoint
+from OSIsoft.AF.PI import PIServers, PIPoint, PIPointList
 from OSIsoft.AF.Time import AFTime, AFTimeRange
 from OSIsoft.AF.Data import AFBoundaryType
 
@@ -76,19 +70,24 @@ def get_current_values(tags):
     """Get current values for multiple tags using batch request"""
     values = {}
     try:
-        # Create PIPoints collection in one batch
-        points = PIPoint.CreatePIPoints(pi_server, tags)
+        # Create List[str] for PI SDK
+        pi_tags = List[str]()
+        for tag in tags:
+            pi_tags.Add(tag)
         
-        # Get all values in one batch request
-        current_values = points.CurrentValue()
+        # Get all points in one batch using FindPIPoints
+        piPoints = PIPointList(PIPoint.FindPIPoints(pi_server, pi_tags))
+        
+        # Get all current values in one batch
+        piCurrentValues = piPoints.CurrentValue()
         
         # Process results
-        for i, tag in enumerate(tags):
+        for point in piCurrentValues:
             try:
-                values[tag] = str(current_values[i].Value)
+                values[point.PIPoint.Name] = str(point.Value)
             except Exception as e:
-                print(f"Error reading tag {tag}: {e}")
-                values[tag] = None
+                print(f"Error reading tag {point.PIPoint.Name}: {e}")
+                values[point.PIPoint.Name] = None
                 
         return values
         
