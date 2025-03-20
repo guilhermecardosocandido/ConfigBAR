@@ -1,4 +1,3 @@
-from LibPI.LibPI import PI 
 from github import Github
 from config import GITHUB_TOKEN, GITHUB_REPO  # Changed to import from config
 import sys
@@ -31,37 +30,8 @@ from OSIsoft.AF.Data import AFBoundaryType
 pi_servers = PIServers()
 pi_server = pi_servers.get_Item("his1.5")
 
-
-
-# Inicializa as variáveis globais
-CS = []  # Para armazenar as demais colunas como dicionário
 config = {}  # Dicionário de configuração
-
-def carregar_dados():
-    """Carrega dados dos arquivos CSV do GitHub."""
-    global config, CS
-    CS.clear()
-    
-    g = Github(GITHUB_TOKEN)
-    repo = g.get_repo(GITHUB_REPO)
-       
-    # Carregar cs.csv
-    try:
-        content = repo.get_contents("cs.csv")
-        cs_content = content.decoded_content.decode('utf-8')
-        cs_lines = cs_content.splitlines()
-        
-        for line in cs_lines:
-            dados = line.split(';')
-            if dados:  # Verifica se a linha não está vazia
-                CS.append(dados[0])  # Primeira coluna
-  
-
-        atualizar_status()            
-    except Exception as e:
-        print(f"Erro ao carregar cs.csv do GitHub: {e}")
-        return [], {}
-            
+status = {}            
 def get_current_values(tags):
     """Get current values for multiple tags using OSIsoft SDK directly"""
     values = {}
@@ -80,7 +50,7 @@ def get_current_values(tags):
         return {}
     
 def atualizar_status():
-    global config
+    global config, status
     status = get_current_values()
     # Exemplo de lógica de configuração
 
@@ -6364,8 +6334,4 @@ def atualizar_status():
     else:
         config['SIA2'] = 1
 
-#    print("Configurações atualizadas:", config)
-
-
-# Chama carregar_dados ao iniciar o módulo
-carregar_dados()
+    print("Configurações atualizadas:", config)
