@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-03-21T10:16:56.219732",
+  "timestamp": "2025-03-21T10:18:14.669899",
   "anotacoes": {
     "CNA1": {
       "anotacao": "SGI XXXXX",
@@ -12,6 +12,10 @@
     "ARE": {
       "anotacao": "Intervenção 15710-25.",
       "previsao": "23/03/2025"
+    },
+    "LVE2": {
+      "anotacao": "13962-25",
+      "previsao": "21/03/2025"
     }
   }
 }
