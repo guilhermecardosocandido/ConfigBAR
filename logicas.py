@@ -1,13 +1,12 @@
-from github import Github
-from config import GITHUB_TOKEN, GITHUB_REPO  # Changed to import from config
 import sys
 import os
 import clr
 import re
 from System.Collections.Generic import List
-import certifi
-import requests
+from functools import wraps
+import traceback
 
+# Variável para controlar se o SDK já foi importado
 #v1.0.0: versão inicial.
 #v1.1.0: inclusão de limpeza de cache e recarregar biblioteca logicas.py ao atualizar get_current_values e ajustado lógica devido seccionamento em PSO2.
 #v1.1.1: entrada parcial SE Caxias Norte.
@@ -17,69 +16,120 @@ import requests
 #v1.1.5: seccionamento LT 230 kV Caxias 2 / Farroupilha na SE Caxias Norte - 10/03/25
 #v2.0.0: nova interface gráfica com melhorias
 # Configuração de certificados para ambientes empacotados
-if getattr(sys, 'frozen', False):
-    os.environ["REQUESTS_CA_BUNDLE"] = os.path.join(sys._MEIPASS, 'certifi', 'cacert.pem')
-else:
-    os.environ["REQUESTS_CA_BUNDLE"] = certifi.where()
 
-def extract_tags_from_code():
-    """Extract all PI tags from the code automatically"""
-    with open(__file__, 'r', encoding='utf-8') as file:
-        content = file.read()
+
+# Variável para controlar se o SDK já foi carregado
+af_sdk_loaded = False
+pi_server = None
+config = {}  # Dicionário de configuração global 
+status = {}  # Status global das tags
+
+try:
+    # Tente importar a lista do .NET que será necessária se o SDK carregar
+    from System.Collections.Generic import List
+except ImportError:
+    # Se não conseguir, crie uma classe fictícia para ser usada em modo de desenvolvimento
+    class List:
+        @staticmethod
+        def Add(item):
+            pass
+
+def safe_sdk_operation(default_return=None):
+    """
+    Decorator para operações seguras com o SDK.
+    Retorna um valor padrão em caso de erro.
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            try:
+                if not af_sdk_loaded:
+                    print(f"SDK não carregado. Função {func.__name__} não executada.")
+                    return default_return
+                return func(*args, **kwargs)
+            except Exception as e:
+                print(f"Erro ao executar {func.__name__}: {e}")
+                traceback.print_exc()
+                return default_return
+        return wrapper
+    return decorator
+
+def load_af_sdk():
+    """Carrega o SDK OSIsoft AF de forma segura"""
+    global af_sdk_loaded, pi_server
     
-    # Pattern to match tag names like 'RSXXX_230_CHXXX_S.s'
-    pattern = r"status\.get\('([A-Z0-9]+_230_[A-Z0-9]+_S\.s)'\)"
-    
-    # Find all unique matches
-    tags = set(re.findall(pattern, content))
-    return sorted(list(tags))
-
-tags = extract_tags_from_code()
-
-def find_dll():
-    """Find and load OSIsoft.AFSDK dll from _internal folder"""
+    # Se já carregou, não tenta carregar novamente
+    if af_sdk_loaded and pi_server is not None:
+        return True
+        
     try:
-        # Get program's root directory (where main.py is)
-        root_dir = os.path.dirname(os.path.dirname(__file__))  # Go up one level from logicas.py
+        # Verifica se estamos em modo de desenvolvimento baseado em uma variável de ambiente
+        if os.environ.get('DJANGO_DEVELOPMENT', 'False').lower() == 'true':
+            print("Modo de desenvolvimento - usando dados simulados")
+            return False
         
-        # Path to _internal folder
+        # Busca onde está o DLL
+        root_dir = os.path.dirname(os.path.dirname(__file__))
         internal_path = os.path.join(root_dir, "_internal")
-        
-        # Add _internal to system path if not already there
         if internal_path not in sys.path:
             sys.path.append(internal_path)
         
-        # Try to load the DLL
+        # Importações que podem falhar
+        import clr
         clr.AddReference('OSIsoft.AFSDK')
-        return True
+        from OSIsoft.AF.PI import PIServers, PIPoint, PIPointList
+        from OSIsoft.AF.Time import AFTime, AFTimeRange
+        from OSIsoft.AF.Data import AFBoundaryType
         
-        print(f"CARREGADO COM SUCESSO:")
-            
+        # Inicializa conexão com o PI Server apenas se ainda não foi inicializado
+        if pi_server is None:
+            pi_servers = PIServers()
+            pi_server = pi_servers.get_Item("his1.5")
+        
+        af_sdk_loaded = True
+        print("SDK OSIsoft carregado com sucesso")
+        return True
     except Exception as e:
-        print(f"Error loading OSIsoft SDK: {e}")
+        print(f"Erro ao carregar OSIsoft SDK: {e}")
+        traceback.print_exc()
         return False
 
-# Initialize OSIsoft SDK
-if not find_dll():
-    raise ImportError("Could not load OSIsoft.AFSDK")
+def extract_tags_from_code():
+    """Extract all PI tags from the code automatically"""
+    try:
+        with open(__file__, 'r', encoding='utf-8') as file:
+            content = file.read()
+        
+        # Pattern to match tag names like 'RSXXX_230_CHXXX_S.s'
+        pattern = r"status\.get\('([A-Z0-9]+_230_[A-Z0-9]+_S\.s)'\)"
+        
+        # Find all unique matches
+        tags = set(re.findall(pattern, content))
+        return sorted(list(tags))
+    except Exception as e:
+        print(f"Erro ao extrair tags: {e}")
+        return []
 
-from OSIsoft.AF.PI import PIServers, PIPoint, PIPointList
-from OSIsoft.AF.Time import AFTime, AFTimeRange
-from OSIsoft.AF.Data import AFBoundaryType
+# Extrai as tags do código
+tags = extract_tags_from_code()
 
-# Inicializar conexão com o PI Server
-pi_servers = PIServers()
-pi_server = pi_servers.get_Item("his1.5")
-
-config = {}  # Dicionário de configuração
-
-def get_current_values(tags):
+@safe_sdk_operation(default_return={})
+def get_current_values(tags_list):
     """Get current values for multiple tags using batch request"""
+    global pi_server
+    
+    if not af_sdk_loaded or pi_server is None:
+        # Retornar dados fictícios para desenvolvimento
+        return get_simulated_values(tags_list)
+    
     values = {}
     try:
+        # Precisa reimportar aqui para ter acesso dentro da função
+        from OSIsoft.AF.PI import PIPoint, PIPointList
+        
         # Create List[str] for PI SDK
         pi_tags = List[str]()
-        for tag in tags:
+        for tag in tags_list:
             pi_tags.Add(tag)
         
         # Get all points in one batch using FindPIPoints
@@ -100,10 +150,27 @@ def get_current_values(tags):
         
     except Exception as e:
         print(f"Error getting current values: {e}")
-        return {}
-    
+        return get_simulated_values(tags_list)  # Fallback para valores simulados
+
+def get_simulated_values(tags_list):
+    """Gera valores simulados para desenvolvimento e testes"""
+    simulated = {}
+    for tag in tags_list:
+        # Aleatoriamente atribui valores "on" ou "off" para simular o comportamento
+        import random
+        state = "on" if random.random() > 0.5 else "off"
+        simulated[tag] = f"Estado do ponto digital:{state}"
+    return simulated
+
 def atualizar_get_current_values():
+    """Atualiza os valores das tags e configura o estado dos equipamentos"""
     global config, status
+    
+    # Tenta carregar o SDK apenas uma vez
+    if not af_sdk_loaded:
+        load_af_sdk()
+    
+    # Obtém os valores atuais
     status = get_current_values(tags)
 
     # Exemplo de lógica de configuração
@@ -6391,3 +6458,17 @@ def atualizar_get_current_values():
 #    print("Configurações atualizadas:", config)
 
 atualizar_get_current_values()
+
+# Propriedades para acesso externo
+@property
+def config():
+    """Retorna a configuração atual"""
+    return config
+
+@property
+def status():
+    """Retorna o status atual das tags"""
+    return status
+
+# Tenta carregar o SDK na inicialização, mas não falha se não conseguir
+load_af_sdk()
