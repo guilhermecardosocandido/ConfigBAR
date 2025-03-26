@@ -6457,18 +6457,6 @@ def atualizar_get_current_values():
 
 #    print("Configurações atualizadas:", config)
 
-
-# Propriedades para acesso externo
-@property
-def config():
-    """Retorna a configuração atual"""
-    return config
-
-@property
-def status():
-    """Retorna o status atual das tags"""
-    return status
-
 # Tenta carregar o SDK na inicialização, mas não falha se não conseguir
 load_af_sdk()
 
