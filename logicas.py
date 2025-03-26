@@ -6457,7 +6457,6 @@ def atualizar_get_current_values():
 
 #    print("Configurações atualizadas:", config)
 
-atualizar_get_current_values()
 
 # Propriedades para acesso externo
 @property
@@ -6472,3 +6471,5 @@ def status():
 
 # Tenta carregar o SDK na inicialização, mas não falha se não conseguir
 load_af_sdk()
+
+atualizar_get_current_values()
