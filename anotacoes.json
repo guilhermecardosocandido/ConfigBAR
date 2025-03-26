@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-03-25T20:35:55.373780",
+  "timestamp": "2025-03-26T16:18:01.035204",
   "anotacoes": {
     "CNA1": {
       "anotacao": "54976-24",
@@ -16,10 +16,6 @@
     "UHSO": {
       "anotacao": "SGI 14.291-25",
       "previsao": "27/03/2025"
-    },
-    "FAR": {
-      "anotacao": "SGI 13.831-25",
-      "previsao": "28/03/2025"
     }
   }
 }
