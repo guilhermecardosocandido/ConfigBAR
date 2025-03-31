@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-03-28T13:07:12.336378",
+  "timestamp": "2025-03-31T10:12:08.885129",
   "anotacoes": {
     "CNA1": {
       "anotacao": "54976-24",
@@ -13,9 +13,9 @@
       "anotacao": "49.589-24",
       "previsao": "30/04/2025"
     },
-    "FAR": {
-      "anotacao": "teste",
-      "previsao": "28/03/2025"
+    "ARE": {
+      "anotacao": "Intervenção 16021/25",
+      "previsao": "18/04/2025"
     }
   }
 }
