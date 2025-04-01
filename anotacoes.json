@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-03-31T10:12:08.885129",
+  "timestamp": "2025-04-01T12:20:16.661288",
   "anotacoes": {
     "CNA1": {
       "anotacao": "54976-24",
@@ -16,6 +16,10 @@
     "ARE": {
       "anotacao": "Intervenção 16021/25",
       "previsao": "18/04/2025"
+    },
+    "IMB": {
+      "anotacao": "SGI15099-25",
+      "previsao": "01/04/2025"
     }
   }
 }
